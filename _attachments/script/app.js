@@ -83,16 +83,21 @@ function TodoCtrl($scope, cornercouch) {
 
     $scope.tags={list: []};
     
-    $scope.userdb.query("todo", "tags", { group: true })
-        .success(function(data, status) {
-            var tags=[];
-            for (var i=0; i<data.rows.length; i++) {
-                var row = data.rows[i];
-                tags.push(row.key);
+    $scope.updateTagsList = function() {
+    
+        $scope.userdb.query("todo", "tags", { group: true })
+            .success(function(data, status) {
+                var tags=[];
+                for (var i=0; i<data.rows.length; i++) {
+                    var row = data.rows[i];
+                    tags.push(row.key);
+                }
+                $scope.tags.list=tags;
+            if (typeof($scope.tags.selected) == "undefined") {
+                $scope.changedTag($scope.tags.list[0]);
             }
-            $scope.tags.list=tags;
-            $scope.changedTag($scope.tags.list[0]);
         });
+    };
 
     
         
@@ -103,13 +108,14 @@ function TodoCtrl($scope, cornercouch) {
     }   
 
     $scope.initNewTodo();
-
+    $scope.updateTagsList();
     
     $scope.addTodo = function() {
         $scope.newTodo.tags.push($scope.tags.selected);
         $scope.newTodo.save()
             .success(function() {
                 $scope.changedTag();
+                $scope.updateTagsList();
             });
         $scope.initNewTodo();
     };
@@ -178,112 +184,3 @@ function InputCtrl($scope, $window, cornercouch) {
     }
 }
 
-
-function StatisticsCtrl($scope, cornercouch) {
-    $scope.server = cornercouch();
-    $scope.server.session();
-    $scope.userdb = $scope.server.getDB('klomp');
-
-    $scope.data={weight: [[[]], [[]]]};
-    
-    $scope.userdb.query("health_diary", "heart_pulse", { include_docs: false, descending: true})
-        .success(function(data, status) {
-            var pulse=[];
-            for (var i=0; i<data.rows.length; i++) {
-                var row = data.rows[i];
-                pulse.push([getTimestamp(row.key[0], row.key[1]), row.value]);
-            }
-            $scope.data.pulse=[pulse];
-        });
-
-    $scope.userdb.query("health_diary", "heart_pressure", { include_docs: false, descending: true})
-        .success(function(data, status) {
-            var diastolic=[];
-            var systolic=[];
-            
-            for (var i=0; i<data.rows.length; i++) {
-                var row = data.rows[i];
-                diastolic.push([getTimestamp(row.key[0], row.key[1]), row.value["diastolic"]]);
-                systolic.push([getTimestamp(row.key[0], row.key[1]), row.value["systolic"]]);
-            }
-            $scope.data.pressure=[diastolic, systolic];
-        });
-    
-
-    $scope.userdb.query("health_diary", "weight_dressed", { include_docs: false, descending: true})
-        .success(function(data, status) {
-            var weight=[];
-            
-            for (var i=0; i<data.rows.length; i++) {
-                var row = data.rows[i];
-                weight.push([getTimestamp(row.key[0], row.key[1]), row.value]);
-            }
-            $scope.data.weight=[$scope.data.weight[0],weight];
-        });
-        
-    $scope.userdb.query("health_diary", "weight_naked", { include_docs: false, descending: true})
-        .success(function(data, status) {
-            var weight=[];
-            
-            for (var i=0; i<data.rows.length; i++) {
-                var row = data.rows[i];
-                weight.push([getTimestamp(row.key[0], row.key[1]), row.value]);
-            }
-            $scope.data.weight=[weight, $scope.data.weight[1]];
-        });
-
-        
-}
-
-function getIsoDate(date) {
-    if ( typeof(date) == "undefined" ) {
-        date= new Date();
-    }
-
-    var year = date.getFullYear();
-    
-    var month = date.getMonth()+1;
-    if(month <= 9)
-        month = '0'+month;
-
-    var day= date.getDate();
-    if(day <= 9)
-        day = '0'+day;
-
-    var isoDate = year +'-'+ month +'-'+ day;
-    return isoDate;
-}
-
-function getTime(date) {
-    if ( typeof(date) == "undefined" ) {
-        date= new Date();
-    }
-
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    
-    if(minutes <= 9)
-        minutes = '0'+minutes;
-    if(hours <= 9)
-        hours = '0'+hours;
-
-    var isoTime = hours +':'+ minutes;
-    return isoTime;
-}
-
-function getTimestamp(date, time) {
-    if (typeof(time) === "undefined") {
-        return (new Date(date)).getTime();
-    }
-    else {
-        // Check, if time has leading zero
-        if (time.split(":")[0].length==2) {
-            return (new Date(date+ "T" + time+":00")).getTime();
-        }
-        else
-        {
-            return (new Date(date+ "T0" + time+":00")).getTime();
-        }
-    }
-    
-}
