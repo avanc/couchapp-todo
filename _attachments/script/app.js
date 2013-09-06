@@ -141,10 +141,12 @@ function TodoCtrl($scope, cornercouch) {
     };
      
     $scope.archive = function() {
-        var oldTodos = $scope.todos;
-        $scope.todos = [];
-        angular.forEach(oldTodos, function(todo) {
-            if (!todo.done) $scope.todos.push(todo);
+        var oldtodos=$scope.todos;
+        angular.forEach(oldtodos, function(todo) {
+            if (todo.done)
+            {
+                todo.remove();
+            }
         });
     };
 }
