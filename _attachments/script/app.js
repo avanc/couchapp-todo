@@ -33,7 +33,7 @@ App.directive('mytodo', function () {
                         '<div ng_show="showDetails">{{todo.details}}</div>' +
                     '</div>' +
                     '<div ng_show="editing">' +
-                        '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a><br>' +
+                        '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
                         '<div ng_hide="editingonly">' +
                             '<input type="textarea" ng-model="todo.details" placeholder="Details"><br>' +
                             '<span ng-repeat="tag in todo.tags">{{tag}}<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
@@ -54,12 +54,21 @@ App.directive('mytodo', function () {
             scope.editTodo = function() {
                 scope.editing=true;
             };
+
             scope.saveTodo = function() {
                 scope.todo.save().success( function() {
                     scope.editing=false;
                 });
             };
 
+            scope.loadTodo = function() {
+                scope.todo.load().success( function() {
+                    scope.editing=false;
+                });
+            };
+
+            
+            
             scope.addTag = function() {
                 scope.todo.tags.push(scope.tagText);
                 scope.tagText = '';
