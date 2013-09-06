@@ -1,10 +1,11 @@
 function(doc) {
     if (doc.type == "todo") {
+        emit(["", doc.title], doc);
+
         if (typeof(doc.tags) !== "undefined") {
-            emit("", doc);
 
             for (var i=0; i<doc.tags.length; i++) {
-                emit(doc.tags[i], doc);
+                emit([doc.tags[i], doc.title], doc);
             }
         }
     }

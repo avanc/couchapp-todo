@@ -87,26 +87,23 @@ function TodoCtrl($scope, cornercouch) {
         });
 
     
-    
-    
-    $scope.todos_by_tag = {
-        Einkaufen: [
-            {text:'Milk', done:true, tags : ["Tag1", "Tag2"], details: "Hallo Welt!"},
-            {text:'Butter', done:false, tags : ["Tag1", "Tag2"]}
-        ], 
-        Computer: [
-            {text:'Backup', done:true, tags : ["Tag1", "Tag2"], details: "Hallo Welt!"},
-            {text:'Clean Keyboard', done:false, tags : ["Tag1", "Tag2"]}
-        ], 
-        Lesen: [
-            {text:'Bible', done:true, tags : ["Tag1", "Tag2"], details: "Hallo Welt!"}
-        ]
-    };
         
-        
+    $scope.initNewTodo = function() {
+        $scope.newTodo = $scope.userdb.newDoc(); 
+        $scope.newTodo.type = "todo";
+        $scope.newTodo.tags= ["new"];
+    }   
+
+    $scope.initNewTodo();
+
+    
     $scope.addTodo = function() {
-        $scope.todos.push({title:$scope.todoText, tags: ["new"], done:false});
-        $scope.todoText = '';
+        $scope.newTodo.tags.push($scope.tags.selected);
+        $scope.newTodo.save()
+            .success(function() {
+                $scope.changedTag();
+            });
+        $scope.initNewTodo();
     };
      
 
@@ -115,7 +112,7 @@ function TodoCtrl($scope, cornercouch) {
             $scope.tags.selected=tag;
         }
 
-        $scope.userdb.query("todo", "by_tag", { key: $scope.tags.selected})
+        $scope.userdb.query("todo", "by_tag", { startkey: [$scope.tags.selected], endkey: [$scope.tags.selected, {}], include_docs: true })
             .success(function(data, status) {
                 var todos=[];
                 for (var i=0; i<data.rows.length; i++) {
