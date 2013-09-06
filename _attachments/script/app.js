@@ -23,12 +23,12 @@ App.directive('mytodo', function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<a href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.text}}</a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
+                        '<a href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}</a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done"> ' +
                         '<div ng_show="showDetails">{{todo.details}}</div>' +
                     '</div>' +
                     '<div ng_show="editing">' +
-                        '<input type="text" ng-model="todo.text"> <a href="" ng-click="saveTodo()">s</a><br>' +
+                        '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a><br>' +
                         '<div ng_hide="editingonly">' +
                             '<input type="textarea" ng-model="todo.details" placeholder="Details"><br>' +
                             '<span ng-repeat="tag in todo.tags">{{tag}}<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
@@ -68,10 +68,27 @@ App.directive('mytodo', function () {
 });
    
 
-function TodoCtrl($scope) {
+function TodoCtrl($scope, cornercouch) {
+    $scope.server = cornercouch();
+    $scope.server.session();
+    $scope.userdb = $scope.server.getDB('klomp');
+
+    $scope.tags={list: []};
+    
+    $scope.userdb.query("todo", "tags", { group: true })
+        .success(function(data, status) {
+            var tags=[];
+            for (var i=0; i<data.rows.length; i++) {
+                var row = data.rows[i];
+                tags.push(row.key);
+            }
+            $scope.tags.list=tags;
+            $scope.changedTag($scope.tags.list[0]);
+        });
 
     
-    $scope.tags= {list:["Einkaufen", "Computer", "Lesen"]};
+    
+    
     $scope.todos_by_tag = {
         Einkaufen: [
             {text:'Milk', done:true, tags : ["Tag1", "Tag2"], details: "Hallo Welt!"},
@@ -88,18 +105,27 @@ function TodoCtrl($scope) {
         
         
     $scope.addTodo = function() {
-        $scope.todos.push({text:$scope.todoText, tags: ["new"], done:false});
+        $scope.todos.push({title:$scope.todoText, tags: ["new"], done:false});
         $scope.todoText = '';
     };
      
 
-    $scope.changedTag = function() {
-        $scope.todos=$scope.todos_by_tag[$scope.tags.selected];
+    $scope.changedTag = function(tag) {
+        if (typeof(tag)!=="undefined") {
+            $scope.tags.selected=tag;
+        }
+
+        $scope.userdb.query("todo", "by_tag", { key: $scope.tags.selected})
+            .success(function(data, status) {
+                var todos=[];
+                for (var i=0; i<data.rows.length; i++) {
+                    var row = data.rows[i];
+                    todos.push(row.value);
+                }
+                $scope.todos=todos;
+            });
     };
 
-    $scope.tags.selected=$scope.tags.list[0];
-    $scope.changedTag();
-        
         
     $scope.remaining = function() {
         var count = 0;
@@ -119,3 +145,138 @@ function TodoCtrl($scope) {
 }
 
  
+function InputCtrl($scope, $window, cornercouch) {
+    $scope.server = cornercouch();
+    $scope.server.session();
+    $scope.userdb = $scope.server.getDB('klomp');
+    initEntry();
+    
+    $scope.submitData = function() {
+        $scope.newentry.save()
+            .success(function(data, status) {
+                initEntry();
+                $window.history.back();
+            })
+            .error(function(data, status) {
+                alert(status);
+                alert(data);
+            });
+    };
+    
+    function initEntry() {
+        $scope.newentry = $scope.userdb.newDoc(); 
+        $scope.newentry.type = "health";
+        $scope.newentry.date = getIsoDate();
+        $scope.newentry.time = getTime();
+    }
+}
+
+
+function StatisticsCtrl($scope, cornercouch) {
+    $scope.server = cornercouch();
+    $scope.server.session();
+    $scope.userdb = $scope.server.getDB('klomp');
+
+    $scope.data={weight: [[[]], [[]]]};
+    
+    $scope.userdb.query("health_diary", "heart_pulse", { include_docs: false, descending: true})
+        .success(function(data, status) {
+            var pulse=[];
+            for (var i=0; i<data.rows.length; i++) {
+                var row = data.rows[i];
+                pulse.push([getTimestamp(row.key[0], row.key[1]), row.value]);
+            }
+            $scope.data.pulse=[pulse];
+        });
+
+    $scope.userdb.query("health_diary", "heart_pressure", { include_docs: false, descending: true})
+        .success(function(data, status) {
+            var diastolic=[];
+            var systolic=[];
+            
+            for (var i=0; i<data.rows.length; i++) {
+                var row = data.rows[i];
+                diastolic.push([getTimestamp(row.key[0], row.key[1]), row.value["diastolic"]]);
+                systolic.push([getTimestamp(row.key[0], row.key[1]), row.value["systolic"]]);
+            }
+            $scope.data.pressure=[diastolic, systolic];
+        });
+    
+
+    $scope.userdb.query("health_diary", "weight_dressed", { include_docs: false, descending: true})
+        .success(function(data, status) {
+            var weight=[];
+            
+            for (var i=0; i<data.rows.length; i++) {
+                var row = data.rows[i];
+                weight.push([getTimestamp(row.key[0], row.key[1]), row.value]);
+            }
+            $scope.data.weight=[$scope.data.weight[0],weight];
+        });
+        
+    $scope.userdb.query("health_diary", "weight_naked", { include_docs: false, descending: true})
+        .success(function(data, status) {
+            var weight=[];
+            
+            for (var i=0; i<data.rows.length; i++) {
+                var row = data.rows[i];
+                weight.push([getTimestamp(row.key[0], row.key[1]), row.value]);
+            }
+            $scope.data.weight=[weight, $scope.data.weight[1]];
+        });
+
+        
+}
+
+function getIsoDate(date) {
+    if ( typeof(date) == "undefined" ) {
+        date= new Date();
+    }
+
+    var year = date.getFullYear();
+    
+    var month = date.getMonth()+1;
+    if(month <= 9)
+        month = '0'+month;
+
+    var day= date.getDate();
+    if(day <= 9)
+        day = '0'+day;
+
+    var isoDate = year +'-'+ month +'-'+ day;
+    return isoDate;
+}
+
+function getTime(date) {
+    if ( typeof(date) == "undefined" ) {
+        date= new Date();
+    }
+
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    
+    if(minutes <= 9)
+        minutes = '0'+minutes;
+    if(hours <= 9)
+        hours = '0'+hours;
+
+    var isoTime = hours +':'+ minutes;
+    return isoTime;
+}
+
+function getTimestamp(date, time) {
+    if (typeof(time) === "undefined") {
+        return (new Date(date)).getTime();
+    }
+    else {
+        // Check, if time has leading zero
+        if (time.split(":")[0].length==2) {
+            return (new Date(date+ "T" + time+":00")).getTime();
+        }
+        else
+        {
+            return (new Date(date+ "T0" + time+":00")).getTime();
+        }
+    }
+    
+}
