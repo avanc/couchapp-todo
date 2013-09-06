@@ -1,0 +1,26 @@
+body{
+
+}
+
+.vertical {
+        vertical-align: middle;
+}
+
+.done-true {
+    text-decoration: line-through;
+    color: grey;
+}
+
+
+#hidden {
+        display: none;
+}
+
+.todo_list {
+        max-width:400px;
+}
+
+hr.todo {
+        color: #eeeeee;
+        height: 1px;
+}
