@@ -16,7 +16,12 @@
  *
  */
 
+
+
+
 var App = angular.module('TodoApp', ['CornerCouch']);
+
+
 
     
 App.directive('mytodo', function () {
@@ -24,7 +29,7 @@ App.directive('mytodo', function () {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
                         '<a href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}</a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
-                        '<input style="float:right" type="checkbox" ng-model="todo.done"> ' +
+                        '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
                         '<div ng_show="showDetails">{{todo.details}}</div>' +
                     '</div>' +
                     '<div ng_show="editing">' +
@@ -50,7 +55,9 @@ App.directive('mytodo', function () {
                 scope.editing=true;
             };
             scope.saveTodo = function() {
-                scope.editing=false;
+                scope.todo.save().success( function() {
+                    scope.editing=false;
+                });
             };
 
             scope.addTag = function() {
@@ -70,6 +77,7 @@ App.directive('mytodo', function () {
 
 function TodoCtrl($scope, cornercouch) {
     $scope.server = cornercouch();
+
     $scope.server.session();
     $scope.userdb = $scope.server.getDB('klomp');
 
@@ -117,7 +125,7 @@ function TodoCtrl($scope, cornercouch) {
                 var todos=[];
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
-                    todos.push(row.value);
+                    todos.push($scope.userdb.newDoc(row.doc));
                 }
                 $scope.todos=todos;
             });
