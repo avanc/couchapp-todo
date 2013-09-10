@@ -28,7 +28,7 @@ App.directive('mytodo', function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<a href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}</a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
+                        '<a href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable()">&#8675;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
                         '<div ng_show="showDetails">{{todo.details}}</div>' +
                     '</div>' +
@@ -67,7 +67,17 @@ App.directive('mytodo', function () {
                 });
             };
 
-            
+            scope.detailsavailable = function(){
+                if (typeof(scope.todo.details)=="undefined") {
+                    return false;
+                }
+                else if (scope.todo.details=="") {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
             
             scope.addTag = function() {
                 scope.todo.tags.push(scope.tagText);
