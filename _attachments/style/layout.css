@@ -2,6 +2,12 @@ body{
 
 }
 
+.boxsizingBorder {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
 .vertical {
         vertical-align: middle;
 }
@@ -24,3 +30,47 @@ hr.todo {
         color: #eeeeee;
         height: 1px;
 }
+
+textarea.details_input {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100px;
+    outline: none;
+    resize: none;
+}
+
+div.todo_details {
+        /*border: solid 1px #b3b2b2;*/
+}
+
+a {
+        text-decoration: none;
+        color: #000000;
+}
+
+.todo_title {
+        /*font-size: 150%;*/
+        font-weight: bold;
+        text-decoration: none;
+}
+
+span.tag {
+    border-radius:5px 5px 5px 5px;
+    background-color:#acf;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin: 2px;
+}
+
+fieldset {
+    border: 2px solid #C5D8E1; 
+    border-radius: 6px; 
+    background: white;
+    float:left;
+    
+} 
+

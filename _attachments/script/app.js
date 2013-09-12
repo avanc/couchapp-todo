@@ -28,15 +28,15 @@ App.directive('mytodo', function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<a href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable()">&#8675;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
+                        '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable()">&#8675;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
                         '<div ng_show="showDetails">{{todo.details}}</div>' +
                     '</div>' +
                     '<div ng_show="editing">' +
                         '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
                         '<div ng_hide="editingonly">' +
-                            '<input type="textarea" ng-model="todo.details" placeholder="Details"><br>' +
-                            '<span ng-repeat="tag in todo.tags">{{tag}}<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
+                            '<textarea class="details_input" ng-model="todo.details" placeholder="Details"></textarea><br>' +
+                            '<span class="tag" ng-repeat="tag in todo.tags">{{tag}} <a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
                             '<form ng-submit="addTag()">' +
                                 '<input type="text" ng-model="tagText" size="30" placeholder="add new tag">' +
                                 '<input type="submit" value="add">' +
@@ -106,7 +106,7 @@ function TodoCtrl($scope, cornercouch) {
     
         $scope.userdb.query("todo", "tags", { group: true })
             .success(function(data, status) {
-                var tags=[];
+                var tags=["[All Tags]"];
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
                     tags.push(row.key);
@@ -118,6 +118,7 @@ function TodoCtrl($scope, cornercouch) {
         });
     };
 
+ 
     
         
     $scope.initNewTodo = function() {
@@ -145,15 +146,28 @@ function TodoCtrl($scope, cornercouch) {
             $scope.tags.selected=tag;
         }
 
-        $scope.userdb.query("todo", "by_tag", { startkey: [$scope.tags.selected], endkey: [$scope.tags.selected, {}], include_docs: true })
+        var startkey=[$scope.tags.selected];
+        var endkey=[$scope.tags.selected, {}];
+        
+        $scope.todos_bytags={};
+        
+        if (tag==="[All Tags]") {
+            var startkey=undefined;
+            var endkey=undefined;
+        }
+
+        $scope.userdb.query("todo", "by_tag", { startkey: startkey, endkey: endkey, include_docs: true })
             .success(function(data, status) {
-                var todos=[];
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
-                    todos.push($scope.userdb.newDoc(row.doc));
+                    var current_tag=row.key[0];
+                    if ( !(current_tag in $scope.todos_bytags) ) {
+                        $scope.todos_bytags[current_tag]={tag: current_tag, list: []};
+                    }
+                    $scope.todos_bytags[current_tag].list.push($scope.userdb.newDoc(row.doc));
                 }
-                $scope.todos=todos;
             });
+  
     };
 
         

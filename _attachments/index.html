@@ -21,13 +21,15 @@
             <input type="text" ng-model="newTodo.title" size="30" placeholder="add new todo here">
             <input class="btn-primary" type="submit" value="add">
         </form>
-                      
-        <div class="todo_list">
-            <div ng-repeat="todo in todos">
+      
+        <fieldset class="todo_list" ng-repeat="todos in todos_bytags">
+            <legend>{{todos.tag}}</legend>
+            <div ng-repeat="todo in todos.list">
                 <hr class="todo">
                 <mytodo todo="todo"></mytodo>
             </div>
-        </div>
+        </fieldset>
+
     </div>
 </body>
 </html>
