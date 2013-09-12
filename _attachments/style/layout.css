@@ -64,13 +64,16 @@ span.tag {
     padding-top: 0px;
     padding-bottom: 0px;
     margin: 2px;
+    display: inline-block;
 }
 
 fieldset {
     border: 2px solid #C5D8E1; 
     border-radius: 6px; 
     background: white;
-    float:left;
-    
+    margin-top: 5px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 5px;
 } 
 

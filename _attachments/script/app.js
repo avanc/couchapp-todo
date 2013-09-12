@@ -36,7 +36,7 @@ App.directive('mytodo', function () {
                         '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
                         '<div ng_hide="editingonly">' +
                             '<textarea class="details_input" ng-model="todo.details" placeholder="Details"></textarea><br>' +
-                            '<span class="tag" ng-repeat="tag in todo.tags">{{tag}} <a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
+                            '<span class="tag" ng-repeat="tag in todo.tags">{{tag}}&nbsp;<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
                             '<form ng-submit="addTag()">' +
                                 '<input type="text" ng-model="tagText" size="30" placeholder="add new tag">' +
                                 '<input type="submit" value="add">' +
@@ -170,8 +170,8 @@ function TodoCtrl($scope, cornercouch) {
         var endkey=[$scope.tags.selected, {}];
         
         $scope.todos_bytags={};
-        
-        if (tag==="[All Tags]") {
+
+        if ($scope.tags.selected==="[All Tags]") {
             var startkey=undefined;
             var endkey=undefined;
         }
@@ -181,7 +181,7 @@ function TodoCtrl($scope, cornercouch) {
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
                     var current_tag=row.key[0];
-                    if ( !(current_tag in $scope.todos_bytags) ) {
+                    if (!$scope.todos_bytags.hasOwnProperty(current_tag)) {
                         $scope.todos_bytags[current_tag]={tag: current_tag, list: []};
                     }
                     $scope.todos_bytags[current_tag].list.push($scope.userdb.newDoc(row.doc));
@@ -191,23 +191,39 @@ function TodoCtrl($scope, cornercouch) {
     };
 
         
-    $scope.remaining = function() {
+    $scope.countRemaining = function() {
         var count = 0;
-        angular.forEach($scope.todos, function(todo) {
-            count += todo.done ? 0 : 1;
+        angular.forEach($scope.todos_bytags, function(todos) {
+            angular.forEach(todos.list, function(todo) {
+                count += todo.done ? 0 : 1;
+            });
         });
         return count;
     };
      
-    $scope.archive = function() {
-        var oldtodos=$scope.todos;
-        angular.forEach(oldtodos, function(todo) {
-            if (todo.done)
-            {
-                todo.remove();
-            }
+    $scope.countAll = function() {
+        var count = 0;
+        angular.forEach($scope.todos_bytags, function(todos) {
+            count+= todos.list.length;
         });
+        return count;
     };
+
+    $scope.archive = function() {
+        if ($scope.todos_bytags.hasOwnProperty($scope.tags.selected)) {
+            angular.forEach($scope.todos_bytags[$scope.tags.selected].list, function(todo) {
+                alert(todo.title);
+                if (todo.done)
+                {
+                    todo.remove();
+                }
+            });
+            
+            //$scope.changedTag();
+            // Has to be done after success!
+        }
+    };
+    
 }
 
  
