@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="style/layout.css">
     <script src="script/angular.js" type="text/javascript"></script>
     <script src="script/angular-cornercouch.js" type="text/javascript"></script>
+    <script src="script/showdown.js" type="text/javascript"></script>
     <script src="script/app.js" type="text/javascript"></script>
     <script type="text/javascript">
 
@@ -16,7 +17,7 @@
     <div ng-controller="TodoCtrl">
         <label>Label: </label><select ng-model="tags.selected" ng-options="tag for tag in tags.list" ng-change="changedTag()"></select><br>
         <span>{{remaining()}} of {{todos.length}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
-
+        
         <form ng-submit="addTodo()">
             <input type="text" ng-model="newTodo.title" size="30" placeholder="add new todo here">
             <input class="btn-primary" type="submit" value="add">

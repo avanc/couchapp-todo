@@ -30,7 +30,7 @@ App.directive('mytodo', function () {
         template:   '<div ng-hide="editing">' +
                         '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable()">&#8675;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
-                        '<div ng_show="showDetails">{{todo.details}}</div>' +
+                        '<div ng_show="showDetails" markup="todo.details"></div>' +
                     '</div>' +
                     '<div ng_show="editing">' +
                         '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
@@ -93,6 +93,26 @@ App.directive('mytodo', function () {
     }
 });
    
+
+App.directive('markup', function () {
+    return {
+        restrict: 'A',
+        scope: true, //Child scope
+        link: function (scope, elem, attrs) {
+            var converter = new Showdown.converter();
+            
+            scope.$watch(attrs.markup, function(v) {
+                if (typeof(v)!== "undefined") {
+                    var htmlText = converter.makeHtml(v);
+                    elem.html(htmlText);
+                    
+                }
+            });
+        }
+    }
+});
+
+
 
 function TodoCtrl($scope, cornercouch) {
     $scope.server = cornercouch();
