@@ -26,7 +26,7 @@
         <fieldset class="todo_list" ng-repeat="todos in todos_bytags">
             <legend>{{todos.tag}}</legend>
             <div ng-repeat="todo in todos.list">
-                <hr class="todo">
+                <hr ng-hide="$first" class="todo">
                 <mytodo todo="todo"></mytodo>
             </div>
         </fieldset>
