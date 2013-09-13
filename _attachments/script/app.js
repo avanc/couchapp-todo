@@ -35,7 +35,8 @@ App.directive('mytodo', function () {
                     '<div ng_show="editing">' +
                         '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
                         '<div ng_hide="editingonly">' +
-                            '<textarea class="details_input" ng-model="todo.details" placeholder="Details"></textarea><br>' +
+                            '<textarea class="details_input" ng-model="todo.details.content" placeholder="Details"></textarea><br>' +
+                            '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select>' +
                             '<span class="tag" ng-repeat="tag in todo.tags">{{tag}}&nbsp;<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
                             '<form ng-submit="addTag()">' +
                                 '<input type="text" ng-model="tagText" size="30" placeholder="add new tag">' +
@@ -103,9 +104,22 @@ App.directive('markup', function () {
             
             scope.$watch(attrs.markup, function(v) {
                 if (typeof(v)!== "undefined") {
-                    var htmlText = converter.makeHtml(v);
-                    elem.html(htmlText);
-                    
+                    if (v.hasOwnProperty("language")) {
+                        if (v.language=="markdown") {
+                            var htmlText = converter.makeHtml(v.content);
+                            elem.html(htmlText);
+                        }
+                        else if (v.language=="textile") {
+                            var htmlText = convert_textile(v.content);
+                            elem.html(htmlText);
+                        }
+                        else {
+                            elem.html(v.content); 
+                        }
+                    }
+                    else {
+                        elem.html(v); 
+                    }
                 }
             });
         }
@@ -184,7 +198,8 @@ function TodoCtrl($scope, cornercouch) {
                     if (!$scope.todos_bytags.hasOwnProperty(current_tag)) {
                         $scope.todos_bytags[current_tag]={tag: current_tag, list: []};
                     }
-                    $scope.todos_bytags[current_tag].list.push($scope.userdb.newDoc(row.doc));
+                    var newdoc=$scope.userdb.newDoc(row.doc);
+                    $scope.todos_bytags[current_tag].list.push(newdoc);
                 }
             });
   
