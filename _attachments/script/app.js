@@ -28,13 +28,13 @@ App.directive('mytodo', function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable()">&#8675;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
+                        '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
                         '<div ng_show="showDetails" markup="todo.details"></div>' +
                         '<span ng_show="showDetails" class="tag" ng-repeat="tag in todo.tags">{{tag}}</span>' +
                     '</div>' +
                     '<div ng_show="editing">' +
-                        '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
+                        '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">&#10003;</a> <a href="" ng-click="loadTodo()">&#10007;</a><br>' +
                         '<div ng_hide="editingonly">' +
                             '<textarea class="details_input" ng-model="todo.details.content" placeholder="Details"></textarea><br>' +
                             '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select>' +
