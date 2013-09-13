@@ -122,7 +122,7 @@ App.directive('markup', function () {
                         elem.html(v); 
                     }
                 }
-            });
+            }, true);
         }
     }
 });
