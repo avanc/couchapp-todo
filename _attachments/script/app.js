@@ -73,7 +73,10 @@ App.directive('mytodo', function () {
                 if (typeof(scope.todo.details)=="undefined") {
                     return false;
                 }
-                else if (scope.todo.details=="") {
+                else if (typeof(scope.todo.details.content)=="undefined") {
+                    return false;
+                }
+                else if (scope.todo.details.content=="") {
                     return false;
                 }
                 else {
@@ -228,7 +231,6 @@ function TodoCtrl($scope, cornercouch) {
     $scope.archive = function() {
         if ($scope.todos_bytags.hasOwnProperty($scope.tags.selected)) {
             angular.forEach($scope.todos_bytags[$scope.tags.selected].list, function(todo) {
-                alert(todo.title);
                 if (todo.done)
                 {
                     todo.remove();
