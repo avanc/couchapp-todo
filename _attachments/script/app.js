@@ -31,6 +31,7 @@ App.directive('mytodo', function () {
                         '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable()">&#8675;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">e</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
                         '<div ng_show="showDetails" markup="todo.details"></div>' +
+                        '<span ng_show="showDetails" class="tag" ng-repeat="tag in todo.tags">{{tag}}</span>' +
                     '</div>' +
                     '<div ng_show="editing">' +
                         '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">s</a> <a href="" ng-click="loadTodo()">c</a><br>' +
