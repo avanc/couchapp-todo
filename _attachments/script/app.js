@@ -28,7 +28,7 @@ App.directive('mytodo', function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()">{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
+                        '<a class="todo_title" href="" class="done-{{todo.done}}" ng-click="toggleDetails()"><span class="todo_date" ng_show="isTickler()">{{todo.date}} </span>{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
                         '<div ng_show="showDetails" markup="todo.details"></div>' +
                         '<span ng_show="showDetails" class="tag" ng-repeat="tag in todo.tags">{{tag}}</span>' +
