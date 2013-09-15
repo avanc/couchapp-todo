@@ -35,20 +35,24 @@ App.directive('mytodo', function () {
                     '</div>' +
                     '<div ng_show="editing">' +
                         '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">&#10003;</a> <a href="" ng-click="loadTodo()">&#10007;</a><br>' +
-                        '<div ng_hide="editingonly">' +
-                            '<textarea class="details_input" ng-model="todo.details.content" placeholder="Details"></textarea><br>' +
-                            '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select>' +
-                            '<span class="tag" ng-repeat="tag in todo.tags">{{tag}}&nbsp;<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
-                            '<form ng-submit="addTag()">' +
-                                '<input type="text" ng-model="tagText" size="30" placeholder="add new tag">' +
-                                '<input type="submit" value="add">' +
-                            '</form>' +
-                        '</div>' +
+                        '<label>Type: </label><select ng-model="todo.subtype" ng-options="subtype for subtype in subtypes" ></select><br>' +
+                        '<span ng_show="isTickler()"><input type="text" ng-model="todo.date"><select ng-model="todo.recurrence" ng-options="option for option in recurrencies" ></select><br></span>' +
+                        '<textarea class="details_input" ng-model="todo.details.content" placeholder="Details"></textarea><br>' +
+                        '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select>' +
+                        '<span class="tag" ng-repeat="tag in todo.tags">{{tag}}&nbsp;<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
+                        '<form ng-submit="addTag()">' +
+                            '<input type="text" ng-model="tagText" size="30" placeholder="add new tag">' +
+                            '<input type="submit" value="add">' +
+                        '</form>' +
+                    
                     '</div>',
         scope: {
             todo : "="
         },
         link: function (scope, elem, attrs) {
+            scope.subtypes = ["next", "future", "waiting", "tickler"];
+            scope.recurrencies = ["daily", "weekly", "monthly", "yearly"];
+            
             scope.toggleDetails = function() {
                 scope.showDetails=!scope.showDetails;
             };
@@ -69,6 +73,10 @@ App.directive('mytodo', function () {
                 });
             };
 
+            scope.isTickler = function(){
+                return (scope.todo.subtype==="tickler");
+            }
+            
             scope.detailsavailable = function(){
                 if (typeof(scope.todo.details)=="undefined") {
                     return false;
@@ -140,6 +148,9 @@ function TodoCtrl($scope, cornercouch) {
 
     $scope.tags={list: []};
     
+    $scope.subtypes=["next", "future", "waiting", "tickler"];
+    $scope.subtype=$scope.subtypes[0];
+    
     $scope.updateTagsList = function() {
     
         $scope.userdb.query("todo", "tags", { group: true })
@@ -162,13 +173,14 @@ function TodoCtrl($scope, cornercouch) {
     $scope.initNewTodo = function() {
         $scope.newTodo = $scope.userdb.newDoc(); 
         $scope.newTodo.type = "todo";
-        $scope.newTodo.tags= ["new"];
+        $scope.newTodo.tags= [];
     }   
 
     $scope.initNewTodo();
     $scope.updateTagsList();
     
     $scope.addTodo = function() {
+        $scope.newTodo.subtype=$scope.subtype;
         $scope.newTodo.tags.push($scope.tags.selected);
         $scope.newTodo.save()
             .success(function() {
@@ -194,7 +206,7 @@ function TodoCtrl($scope, cornercouch) {
             var endkey=undefined;
         }
 
-        $scope.userdb.query("todo", "by_tag", { startkey: startkey, endkey: endkey, include_docs: true })
+        $scope.userdb.query("todo", $scope.subtype + "_by_tag", { startkey: startkey, endkey: endkey, include_docs: true })
             .success(function(data, status) {
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
@@ -203,6 +215,9 @@ function TodoCtrl($scope, cornercouch) {
                         $scope.todos_bytags[current_tag]={tag: current_tag, list: []};
                     }
                     var newdoc=$scope.userdb.newDoc(row.doc);
+                    if (typeof(newdoc.subtype)=="undefined") {
+                        newdoc.subtype="next";
+                    }
                     $scope.todos_bytags[current_tag].list.push(newdoc);
                 }
             });
@@ -244,30 +259,4 @@ function TodoCtrl($scope, cornercouch) {
     
 }
 
- 
-function InputCtrl($scope, $window, cornercouch) {
-    $scope.server = cornercouch();
-    $scope.server.session();
-    $scope.userdb = $scope.server.getDB('klomp');
-    initEntry();
-    
-    $scope.submitData = function() {
-        $scope.newentry.save()
-            .success(function(data, status) {
-                initEntry();
-                $window.history.back();
-            })
-            .error(function(data, status) {
-                alert(status);
-                alert(data);
-            });
-    };
-    
-    function initEntry() {
-        $scope.newentry = $scope.userdb.newDoc(); 
-        $scope.newentry.type = "health";
-        $scope.newentry.date = getIsoDate();
-        $scope.newentry.time = getTime();
-    }
-}
 
