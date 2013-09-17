@@ -19,8 +19,16 @@
 
 
 
-var App = angular.module('TodoApp', ['CornerCouch']);
-
+var App = angular.module('TodoApp', ['CornerCouch'])
+    .config(function($routeProvider) {
+        $routeProvider
+            .when('/', {controller: OverviewCtrl, templateUrl: 'overview.html'})
+            .when('/next', {controller: NextCtrl, templateUrl: 'next.html'})
+            .when('/future', {controller: FutureCtrl, templateUrl: 'next.html'})
+            .when('/waiting', {controller: WaitingCtrl, templateUrl: 'next.html'})
+            .when('/tickler', {controller: TicklerCtrl, templateUrl: 'next.html'})
+            .otherwise({redirectTo: '/'});
+    });
 
 
     
@@ -138,6 +146,28 @@ App.directive('markup', function () {
     }
 });
 
+function OverviewCtrl($scope, cornercouch) {
+}
+
+function NextCtrl($scope, cornercouch) {
+    $scope.subtype="next";
+    TodoCtrl($scope, cornercouch);
+}
+
+function FutureCtrl($scope, cornercouch) {
+    $scope.subtype="future";
+    TodoCtrl($scope, cornercouch);
+}
+
+function WaitingCtrl($scope, cornercouch) {
+    $scope.subtype="waiting";
+    TodoCtrl($scope, cornercouch);
+}
+
+function TicklerCtrl($scope, cornercouch) {
+    $scope.subtype="tickler";
+    TodoCtrl($scope, cornercouch);
+}
 
 
 function TodoCtrl($scope, cornercouch) {
@@ -147,9 +177,6 @@ function TodoCtrl($scope, cornercouch) {
     $scope.userdb = $scope.server.getDB('klomp');
 
     $scope.tags={list: []};
-    
-    $scope.subtypes=["next", "future", "waiting", "tickler"];
-    $scope.subtype=$scope.subtypes[0];
     
     $scope.updateTagsList = function() {
     
