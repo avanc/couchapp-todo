@@ -26,9 +26,22 @@ var App = angular.module('TodoApp', ['CornerCouch'])
             .when('/next', {controller: NextCtrl, templateUrl: 'next.html'})
             .when('/future', {controller: FutureCtrl, templateUrl: 'next.html'})
             .when('/waiting', {controller: WaitingCtrl, templateUrl: 'next.html'})
-            .when('/tickler', {controller: TicklerCtrl, templateUrl: 'next.html'})
+            .when('/tickler', {controller: TicklerCtrl, templateUrl: 'tickler.html'})
             .otherwise({redirectTo: '/'});
     });
+//     .service( 'TicklerWatch', [ '$rootScope', 'CornerCouch', function( $rootScope, cornercouch) {
+//         var date= new Date();
+//         
+//         
+//         return {
+//             menu: [ 'item 1' ],
+//             add: function( item ) {
+//                 this.menu.push( item );
+//                 $rootScope.$broadcast( 'MenuService.update', this.menu );
+//             } 
+//         };
+//     }]);
+
 
 
     
@@ -164,12 +177,6 @@ function WaitingCtrl($scope, cornercouch) {
     TodoCtrl($scope, cornercouch);
 }
 
-function TicklerCtrl($scope, cornercouch) {
-    $scope.subtype="tickler";
-    TodoCtrl($scope, cornercouch);
-}
-
-
 function TodoCtrl($scope, cornercouch) {
     $scope.server = cornercouch();
 
@@ -287,3 +294,122 @@ function TodoCtrl($scope, cornercouch) {
 }
 
 
+
+function TicklerCtrl($scope, cornercouch) {
+    $scope.subtype="tickler";
+    $scope.server = cornercouch();
+
+    $scope.server.session();
+    $scope.userdb = $scope.server.getDB('klomp');
+
+      
+    $scope.initNewTodo = function() {
+        $scope.newTodo = $scope.userdb.newDoc(); 
+        $scope.newTodo.type = "todo";
+        $scope.newTodo.tags= [];
+    }   
+
+
+    $scope.initNewTodo();
+    
+    $scope.addTodo = function() {
+        $scope.newTodo.subtype=$scope.subtype;
+        $scope.newTodo.tags.push($scope.tags.selected);
+        $scope.newTodo.save()
+            .success(function() {
+                $scope.changedTag();
+                $scope.updateTagsList();
+            });
+        $scope.initNewTodo();
+    };
+
+
+    $scope.getTicklers = function() {
+        date=getIsoDate((new Date()).addDays(1));
+        date7=getIsoDate((new Date()).addDays(8));
+
+        $scope.todos_grouped=[{title: "Pending", list: []}, {title: "Next 7 Days", list: []}, {title: "Future", list: []}];
+        getTicklers(undefined, [date,], $scope.todos_grouped[0]);
+        getTicklers([date], [date7], $scope.todos_grouped[1]);
+        getTicklers([date7], undefined, $scope.todos_grouped[2]);
+//        var startkey=[$scope.tags.selected];
+//        var endkey=[$scope.tags.selected, {}];
+
+        
+        
+        function getTicklers(startkey, endkey, storage){
+        
+            $scope.userdb.query("todo", "tickler_by_date", { startkey: startkey, endkey: endkey, include_docs: true })
+                .success(function(data, status) {
+                    storage.list=[];
+                    for (var i=0; i<data.rows.length; i++) {
+                        var row = data.rows[i];
+                        var newdoc=$scope.userdb.newDoc(row.doc);
+                        storage.list.push(newdoc);
+                    }
+                });
+        }
+  
+    };
+
+    
+    $scope.getTicklers();
+        
+    $scope.countRemaining = function() {
+        var count = 0;
+        angular.forEach($scope.todos_grouped, function(todos) {
+            angular.forEach(todos.list, function(todo) {
+                count += todo.done ? 0 : 1;
+            });
+        });
+        return count;
+    };
+     
+    $scope.countAll = function() {
+        var count = 0;
+        angular.forEach($scope.todos_grouped, function(todos) {
+            count+= todos.list.length;
+        });
+        return count;
+    };
+
+    $scope.archive = function() {
+        angular.forEach($scope.todos_grouped, function(todos) {
+            angular.forEach(todos.list, function(todo) {
+                if (todo.done)
+                {
+                    todo.remove();
+                }
+            });
+            
+            //$scope.changedTag();
+            // Has to be done after success!
+        });
+    };
+    
+}
+
+
+function getIsoDate(date) {
+    if ( typeof(date) == "undefined" ) {
+        date= new Date();
+    }
+
+    var year = date.getFullYear();
+    
+    var month = date.getMonth()+1;
+    if(month <= 9)
+        month = '0'+month;
+
+    var day= date.getDate();
+    if(day <= 9)
+        day = '0'+day;
+
+    var isoDate = year +'-'+ month +'-'+ day;
+    return isoDate;
+}
+
+Date.prototype.addDays = function(days) {
+    this.setDate(this.getDate() + days);
+    return this;
+};

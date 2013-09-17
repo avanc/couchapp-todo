@@ -1,0 +1,14 @@
+<span>{{countRemaining()}} of {{countAll()}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
+
+<form ng-submit="addTodo()">
+    <input type="text" ng-model="newTodo.title" size="30" placeholder="add new todo here">
+    <input class="btn-primary" type="submit" value="add">
+</form>
+
+<fieldset class="todo_list" ng-repeat="group in todos_grouped">
+    <legend>{{group.title}}</legend>
+    <div ng-repeat="todo in group.list">
+        <hr ng-hide="$first" class="todo">
+        <mytodo todo="todo"></mytodo>
+    </div>
+</fieldset>
