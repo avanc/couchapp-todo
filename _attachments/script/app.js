@@ -28,19 +28,27 @@ var App = angular.module('TodoApp', ['CornerCouch'])
             .when('/waiting', {controller: WaitingCtrl, templateUrl: 'next.html'})
             .when('/tickler', {controller: TicklerCtrl, templateUrl: 'tickler.html'})
             .otherwise({redirectTo: '/'});
-    });
-//     .service( 'TicklerWatch', [ '$rootScope', 'CornerCouch', function( $rootScope, cornercouch) {
-//         var date= new Date();
-//         
-//         
-//         return {
-//             menu: [ 'item 1' ],
-//             add: function( item ) {
-//                 this.menu.push( item );
-//                 $rootScope.$broadcast( 'MenuService.update', this.menu );
-//             } 
-//         };
-//     }]);
+    })
+    .service( 'TicklerWatch', [ '$rootScope', '$timeout', 'cornercouch', function( $rootScope, $timeout, cornercouch) {
+        var pending=false;
+        var server = cornercouch();
+        server.session();
+        var userdb = server.getDB('klomp');
+
+        $timeout(function() {
+            var date=getIsoDate(new Date());
+            userdb.query("todo", "tickler_by_date", { startkey: undefined, endkey: [date, {}], include_docs: false })
+                .success(function(data, status) {
+                    pending=data.rows.length>0;
+                });
+        }, 4000);
+        
+        return {
+            pendingTicklers: function() {
+                return pending;
+            }
+        };
+    }]);
 
 
 
@@ -158,6 +166,12 @@ App.directive('markup', function () {
         }
     }
 });
+
+
+function AppCtrl($scope, TicklerWatch) {
+    $scope.pendingTicklers=TicklerWatch.pendingTicklers;
+}
+
 
 function OverviewCtrl($scope, cornercouch) {
 }
@@ -314,11 +328,9 @@ function TicklerCtrl($scope, cornercouch) {
     
     $scope.addTodo = function() {
         $scope.newTodo.subtype=$scope.subtype;
-        $scope.newTodo.tags.push($scope.tags.selected);
         $scope.newTodo.save()
             .success(function() {
-                $scope.changedTag();
-                $scope.updateTagsList();
+                $scope.getTicklers();
             });
         $scope.initNewTodo();
     };

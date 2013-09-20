@@ -18,14 +18,14 @@
 
     </script>
 </head>
-<body>
+<body ng-controller="AppCtrl">
     <h1>Todo App</h1>
     <a href="#/">Overview</a> |
     <a href="#/next">Next Todos</a> |
     <a href="#/future">Future Todos</a> |
     <a href="#/waiting">Waiting For</a> |
-    <a href="#/tickler">Ticklers</a>
-
+    <a href="#/tickler" ng-class="{alert: pendingTicklers()}">Ticklers</a>
+    
     <div ng-view>
    </div>
 </body>
