@@ -1,8 +1,15 @@
-@colwidth:`getBlockSize(300)`;
+@defaultmargin: 5px;
+@border-color: #C5D8E1;
+@colwidth:`getBlockSize(300)-10`;
+
 
 body{
     font-family: Arial, Helvetica, sans-serif;
     font-size: 100%;
+    margin: 0px;
+            -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
 
 }
 
@@ -32,7 +39,8 @@ body{
 }
 
 hr.todo {
-    color: #eeeeee;
+    border: 0;
+    background-color: @border-color;
     height: 1px;
 }
 
@@ -40,6 +48,9 @@ input[type='text'] {
     font-size: inherit;
     font-family: inherit;
     font-weight: inherit;
+             -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;   
 }
 
 textarea.details_input {
@@ -106,12 +117,12 @@ input.tag {
 
 
 fieldset {
-    border: 2px solid #C5D8E1; 
+    border: 2px solid @border-color; 
     border-radius: 6px; 
     background: white;
     margin-top: 5px;
-    margin-left: 0px;
-    margin-right: 0px;
+    margin-left: 5px;
+    margin-right: 5px;
     margin-bottom: 20px;
         -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
