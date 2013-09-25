@@ -4,6 +4,17 @@
     <title>Todo App</title>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
     <meta charset="utf-8"/>
+    <script type="text/javascript">
+        function getBlockSize(minsize) {
+            var width= window.innerWidth;
+            var divisor = Math.floor(width/minsize);
+            if (divisor ==0) {
+                divisor=1;
+            }
+            
+            return width/divisor;
+        }
+    </script>
     
     <link rel="stylesheet/less" type="text/css" href="style/layout.less">
     <script src="script/less.js" type="text/javascript"></script>
@@ -13,10 +24,8 @@
     <script src="script/showdown.js" type="text/javascript"></script>
     <script src="script/textile.js" type="text/javascript"></script>
     <script src="script/app.js" type="text/javascript"></script>
-    
-    <script type="text/javascript">
 
-    </script>
+
 </head>
 <body ng-controller="AppCtrl">
     <h1>Todo App</h1>
