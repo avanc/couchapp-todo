@@ -57,21 +57,20 @@ App.directive('mytodo', function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<a class="todo_title done-{{todo.done}}" href="" ng-click="toggleDetails()"><span class="todo_date" ng_show="isTickler()">{{todo.date}} </span>{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
                         '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
+                        '<a class="todo_title done-{{todo.done}}" href="" ng-click="toggleDetails()"><span class="todo_date" ng_show="isTickler()">{{todo.date}} </span>{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
                         '<div ng_show="showDetails" markup="todo.details"></div>' +
                         '<span ng_show="showDetails" class="tag" ng-repeat="tag in todo.tags">{{tag}}</span>' +
                     '</div>' +
                     '<div ng_show="editing">' +
-                        '<input type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">&#10003;</a> <a href="" ng-click="loadTodo()">&#10007;</a><br>' +
+                        '<input class="todo_title" type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">&#10003;</a> <a href="" ng-click="loadTodo()">&#10007;</a><br>' +
                         '<label>Type: </label><select ng-model="todo.subtype" ng-options="subtype for subtype in subtypes" ></select><br>' +
                         '<span ng_show="isTickler()"><input type="text" ng-model="todo.date"><select ng-model="todo.recurrence" ng-options="option for option in recurrencies" ></select><br></span>' +
                         '<textarea class="details_input" ng-model="todo.details.content" placeholder="Details"></textarea><br>' +
-                        '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select>' +
+                        '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select><br>' +
                         '<span class="tag" ng-repeat="tag in todo.tags">{{tag}}&nbsp;<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +
-                        '<form ng-submit="addTag()">' +
-                            '<input type="text" ng-model="tagText" size="30" placeholder="add new tag">' +
-                            '<input type="submit" value="add">' +
+                        '<form style="display: inline;" ng-submit="addTag()">' +
+                            '<input class="tag" type="text" style="width: 10em;" ng-model="tagText" placeholder="add new tag">' +
                         '</form>' +
                     
                     '</div>',
