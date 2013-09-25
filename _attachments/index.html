@@ -28,13 +28,14 @@
 
 </head>
 <body ng-controller="AppCtrl">
-    <h1>Todo App</h1>
-    <a href="#/">Overview</a> |
-    <a href="#/next">Next Todos</a> |
-    <a href="#/future">Future Todos</a> |
-    <a href="#/waiting">Waiting For</a> |
-    <a href="#/tickler" ng-class="{alert: pendingTicklers()}">Ticklers</a>
-    
+    <ul id="navlist">
+        <li><a href="#/">Overview</a></li>
+        <li><a href="#/next">Next</a></li>
+        <li><a href="#/future">Future</a></li>
+        <li><a href="#/waiting">Waiting For</a></li>
+        <li><a href="#/tickler" ng-class="{alert: pendingTicklers()}">Ticklers</a></li>
+    </ul>
+
     <div ng-view>
    </div>
 </body>

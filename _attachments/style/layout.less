@@ -76,10 +76,6 @@ a {
     text-decoration: inherit; /* no underline */
 }
 
-a.alert {
-    color: red;
-}
-
 
 .todo_title {
     /*font-size: 150%;*/
@@ -130,3 +126,35 @@ fieldset {
 
 } 
 
+ul#navlist
+{
+padding: 0;
+margin: 0;
+list-style-type: none;
+float: left;
+width: 100%;
+color: #fff;
+background-color: #036;
+}
+
+ul#navlist li { display: inline; }
+
+ul#navlist li a
+{
+float: left;
+color: #fff;
+background-color: #036;
+padding: 0.2em 0.2em;
+text-decoration: none;
+border-right: 1px solid #fff;
+}
+
+ul#navlist li a:hover
+{
+background-color: #369;
+color: #fff;
+}
+
+a.alert {
+    background-color: red !important;
+}
