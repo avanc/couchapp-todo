@@ -32,21 +32,28 @@ var App = angular.module('TodoApp', ['CornerCouch'])
     .service( 'TicklerWatch', [ '$rootScope', '$timeout', 'cornercouch', function( $rootScope, $timeout, cornercouch) {
         var pending=false;
         var server = cornercouch();
+        var timestamp = new Date(0);
         server.session();
         var userdb = server.getDB('klomp');
 
-        $timeout(function() {
-            var date=getIsoDate(new Date());
-            userdb.query("todo", "tickler_by_date", { startkey: undefined, endkey: [date, {}], include_docs: false })
-                .success(function(data, status) {
-                    pending=data.rows.length>0;
-                });
-        }, 4000);
+        function update() {
+            var current_timestamp = new Date();
+            
+            if ( (current_timestamp-timestamp)>60000 ) { // Update every minute at most
+                timestamp=current_timestamp;
+                var date=getIsoDate(timestamp);
+                userdb.query("todo", "tickler_by_date", { startkey: undefined, endkey: [date, {}], include_docs: false })
+                    .success(function(data, status) {
+                        pending=data.rows.length>0;
+                    });
+            }
+        };
         
         return {
             pendingTicklers: function() {
                 return pending;
-            }
+            },
+            update: update
         };
     }]);
 
@@ -169,28 +176,31 @@ App.directive('markup', function () {
 
 function AppCtrl($scope, TicklerWatch) {
     $scope.pendingTicklers=TicklerWatch.pendingTicklers;
+    TicklerWatch.update();
 }
 
 
-function OverviewCtrl($scope, cornercouch) {
+function OverviewCtrl($scope, cornercouch, TicklerWatch) {
+    TicklerWatch.update();
 }
 
-function NextCtrl($scope, cornercouch) {
+function NextCtrl($scope, cornercouch, TicklerWatch) {
     $scope.subtype="next";
-    TodoCtrl($scope, cornercouch);
+    TodoCtrl($scope, cornercouch, TicklerWatch);
 }
 
-function FutureCtrl($scope, cornercouch) {
+function FutureCtrl($scope, cornercouch, TicklerWatch) {
     $scope.subtype="future";
-    TodoCtrl($scope, cornercouch);
+    TodoCtrl($scope, cornercouch, TicklerWatch);
 }
 
-function WaitingCtrl($scope, cornercouch) {
+function WaitingCtrl($scope, cornercouch, TicklerWatch) {
     $scope.subtype="waiting";
-    TodoCtrl($scope, cornercouch);
+    TodoCtrl($scope, cornercouch, TicklerWatch);
 }
 
-function TodoCtrl($scope, cornercouch) {
+function TodoCtrl($scope, cornercouch, TicklerWatch) {
+    TicklerWatch.update();
     $scope.server = cornercouch();
 
     $scope.server.session();
@@ -308,7 +318,8 @@ function TodoCtrl($scope, cornercouch) {
 
 
 
-function TicklerCtrl($scope, cornercouch) {
+function TicklerCtrl($scope, cornercouch, TicklerWatch) {
+    TicklerWatch.update();
     $scope.subtype="tickler";
     $scope.server = cornercouch();
 
