@@ -1,6 +1,6 @@
 @defaultmargin: 5px;
 @border-color: #C5D8E1;
-@colwidth:`getBlockSize(300)-10`;
+@colwidth:`getBlockSize2(600)-10`;
 
 
 body{
@@ -129,7 +129,13 @@ fieldset {
        -moz-box-sizing: border-box;
             box-sizing: border-box;
 
-} 
+}
+
+
+fieldset legend {
+  background-color: @border-color;
+  border-radius: 6px; 
+}
 
 ul#navlist
 {
