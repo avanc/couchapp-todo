@@ -29,12 +29,12 @@ var App = angular.module('TodoApp', ['CornerCouch'])
             .when('/tickler', {controller: TicklerCtrl, templateUrl: 'tickler.html'})
             .otherwise({redirectTo: '/'});
     })
-    .service( 'TicklerWatch', [ '$rootScope', '$timeout', 'cornercouch', function( $rootScope, $timeout, cornercouch) {
+    .service( 'TicklerWatch', [ '$rootScope', '$timeout', '$location', 'cornercouch', function( $rootScope, $timeout, $location, cornercouch) {
         var pending=false;
         var server = cornercouch();
         var timestamp = new Date(0);
         server.session();
-        var userdb = server.getDB('klomp');
+        var userdb = server.getDB(getDatabaseName($location));
 
         function update() {
             var current_timestamp = new Date();
@@ -180,31 +180,30 @@ function AppCtrl($scope, TicklerWatch) {
 }
 
 
-function OverviewCtrl($scope, cornercouch, TicklerWatch) {
+function OverviewCtrl($scope, $location, cornercouch, TicklerWatch) {
     TicklerWatch.update();
 }
 
-function NextCtrl($scope, cornercouch, TicklerWatch) {
+function NextCtrl($scope, $location, cornercouch, TicklerWatch) {
     $scope.subtype="next";
-    TodoCtrl($scope, cornercouch, TicklerWatch);
+    TodoCtrl($scope, $location, cornercouch, TicklerWatch);
 }
 
-function FutureCtrl($scope, cornercouch, TicklerWatch) {
+function FutureCtrl($scope, $location, cornercouch, TicklerWatch) {
     $scope.subtype="future";
-    TodoCtrl($scope, cornercouch, TicklerWatch);
+    TodoCtrl($scope, $location, cornercouch, TicklerWatch);
 }
 
-function WaitingCtrl($scope, cornercouch, TicklerWatch) {
+function WaitingCtrl($scope, $location, cornercouch, TicklerWatch) {
     $scope.subtype="waiting";
-    TodoCtrl($scope, cornercouch, TicklerWatch);
+    TodoCtrl($scope, $location, cornercouch, TicklerWatch);
 }
 
-function TodoCtrl($scope, cornercouch, TicklerWatch) {
+function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
     TicklerWatch.update();
     $scope.server = cornercouch();
-
     $scope.server.session();
-    $scope.userdb = $scope.server.getDB('klomp');
+    $scope.userdb = $scope.server.getDB(getDatabaseName($location));
 
     $scope.tags={list: []};
     
@@ -318,13 +317,13 @@ function TodoCtrl($scope, cornercouch, TicklerWatch) {
 
 
 
-function TicklerCtrl($scope, cornercouch, TicklerWatch) {
+function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
     TicklerWatch.update();
     $scope.subtype="tickler";
     $scope.server = cornercouch();
 
     $scope.server.session();
-    $scope.userdb = $scope.server.getDB('klomp');
+    $scope.userdb = $scope.server.getDB(getDatabaseName($location));
 
       
     $scope.initNewTodo = function() {
@@ -411,6 +410,22 @@ function TicklerCtrl($scope, cornercouch, TicklerWatch) {
     
 }
 
+function getDatabaseName($location) {
+    var parser = document.createElement('a');
+
+    parser.href = $location.absUrl();
+//    parser.protocol; // => "http:"
+//    parser.hostname; // => "example.com"
+//    parser.port; // => "3000"
+//    parser.pathname; // => "/pathname/"
+//    parser.search; // => "?search=test"
+//    parser.hash; // => "#hash"
+//    parser.host; // => "example.com:3000"
+
+    var pattern= new RegExp('/([^/]+)/_design/.*');
+    var match = pattern.exec(parser.pathname);
+    return match[1];
+}
 
 function getIsoDate(date) {
     if ( typeof(date) == "undefined" ) {
