@@ -33,8 +33,10 @@ var App = angular.module('TodoApp', ['CornerCouch'])
         var pending=false;
         var server = cornercouch();
         var timestamp = new Date(0);
-        server.session();
-        var userdb = server.getDB(getDatabaseName($location));
+        var uri = parseUri($location.absUrl());
+    
+//    $scope.server.session();
+        userdb = server.getDB(uri.database);
 
         function update() {
             var current_timestamp = new Date();
@@ -43,7 +45,7 @@ var App = angular.module('TodoApp', ['CornerCouch'])
                 timestamp=current_timestamp;
                 var date=getIsoDate(timestamp);
                 userdb.query("todo", "tickler_by_date", { startkey: undefined, endkey: [date, {}], include_docs: false })
-                    .success(function(data, status) {
+                    .then(function(data) {
                         pending=data.rows.length>0;
                     });
             }
@@ -97,13 +99,13 @@ App.directive('mytodo', function () {
             };
 
             scope.saveTodo = function() {
-                scope.todo.save().success( function() {
+                scope.todo.save().then( function() {
                     scope.editing=false;
                 });
             };
 
             scope.loadTodo = function() {
-                scope.todo.load().success( function() {
+                scope.todo.load().then( function() {
                     scope.editing=false;
                 });
             };
@@ -202,15 +204,28 @@ function WaitingCtrl($scope, $location, cornercouch, TicklerWatch) {
 function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
     TicklerWatch.update();
     $scope.server = cornercouch();
-    $scope.server.session();
-    $scope.userdb = $scope.server.getDB(getDatabaseName($location));
+    
+    var uri = parseUri($location.absUrl());
+    
+//    $scope.server.session();
+    $scope.userdb = $scope.server.getDB(uri.database);
+    remoteDatabase = uri.protocol + '//' + uri.host + '/' + uri.database + '/';
+    var c2p = $scope.userdb.pouchdb.replicate.from(remoteDatabase, {
+        continuous: true
+    });
+
+    var p2c = $scope.userdb.pouchdb.replicate.to(remoteDatabase, {
+        continuous: true
+    });
+
+    //p2c.cancel();
 
     $scope.tags={list: []};
     
     $scope.updateTagsList = function() {
     
         $scope.userdb.query("todo", "tags", { group: true })
-            .success(function(data, status) {
+            .then(function(data) {
                 var tags=["[All Tags]"];
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
@@ -239,7 +254,7 @@ function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
         $scope.newTodo.subtype=$scope.subtype;
         $scope.newTodo.tags.push($scope.tags.selected);
         $scope.newTodo.save()
-            .success(function() {
+            .then(function() {
                 $scope.changedTag();
                 $scope.updateTagsList();
             });
@@ -263,7 +278,7 @@ function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
         }
 
         $scope.userdb.query("todo", $scope.subtype + "_by_tag", { startkey: startkey, endkey: endkey, include_docs: true })
-            .success(function(data, status) {
+            .then(function(data) {
                 for (var i=0; i<data.rows.length; i++) {
                     var row = data.rows[i];
                     var current_tag=row.key[0];
@@ -322,8 +337,10 @@ function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
     $scope.subtype="tickler";
     $scope.server = cornercouch();
 
-    $scope.server.session();
-    $scope.userdb = $scope.server.getDB(getDatabaseName($location));
+    var uri = parseUri($location.absUrl());
+    
+//    $scope.server.session();
+    $scope.userdb = $scope.server.getDB(uri.database);
 
       
     $scope.initNewTodo = function() {
@@ -338,7 +355,7 @@ function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
     $scope.addTodo = function() {
         $scope.newTodo.subtype=$scope.subtype;
         $scope.newTodo.save()
-            .success(function() {
+            .then(function() {
                 $scope.getTicklers();
             });
         $scope.initNewTodo();
@@ -361,7 +378,7 @@ function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
         function getTicklers(startkey, endkey, storage){
         
             $scope.userdb.query("todo", "tickler_by_date", { startkey: startkey, endkey: endkey, include_docs: true })
-                .success(function(data, status) {
+                .then(function(data) {
                     storage.list=[];
                     for (var i=0; i<data.rows.length; i++) {
                         var row = data.rows[i];
@@ -410,21 +427,23 @@ function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
     
 }
 
-function getDatabaseName($location) {
+function parseUri(uri) {
     var parser = document.createElement('a');
-
-    parser.href = $location.absUrl();
-//    parser.protocol; // => "http:"
-//    parser.hostname; // => "example.com"
-//    parser.port; // => "3000"
-//    parser.pathname; // => "/pathname/"
-//    parser.search; // => "?search=test"
-//    parser.hash; // => "#hash"
-//    parser.host; // => "example.com:3000"
+    parser.href = uri;
+    var result = {};
+    result.protocol = parser.protocol; // => "http:"
+    result.hostname = parser.hostname; // => "example.com"
+    result.port = parser.port; // => "3000"
+    result.pathname = parser.pathname; // => "/pathname/"
+    result.search = parser.search; // => "?search=test"
+    result.hash = parser.hash; // => "#hash"
+    result.host = parser.host; // => "example.com:3000"
 
     var pattern= new RegExp('/([^/]+)/_design/.*');
-    var match = pattern.exec(parser.pathname);
-    return match[1];
+    var match = pattern.exec(result.pathname);
+    result.database = match[1];
+    
+    return result;
 }
 
 function getIsoDate(date) {
