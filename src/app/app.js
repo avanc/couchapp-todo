@@ -49,7 +49,7 @@ var App = angular.module('TodoApp', ['CornerCouch'])
                         pending=data.rows.length>0;
                     });
             }
-        };
+        }
         
         return {
             pendingTicklers: function() {
@@ -112,7 +112,7 @@ App.directive('mytodo', function () {
 
             scope.isTickler = function(){
                 return (scope.todo.subtype==="tickler");
-            }
+            };
             
             scope.detailsavailable = function(){
                 if (typeof(scope.todo.details)=="undefined") {
@@ -121,13 +121,13 @@ App.directive('mytodo', function () {
                 else if (typeof(scope.todo.details.content)=="undefined") {
                     return false;
                 }
-                else if (scope.todo.details.content=="") {
+                else if (scope.todo.details.content==="") {
                     return false;
                 }
                 else {
                     return true;
                 }
-            }
+            };
             
             scope.addTag = function() {
                 scope.todo.tags.push(scope.tagText);
@@ -140,7 +140,7 @@ App.directive('mytodo', function () {
             };
 
         }
-    }
+    };
 });
    
 
@@ -155,12 +155,10 @@ App.directive('markup', function () {
                 if (typeof(v)!== "undefined") {
                     if (v.hasOwnProperty("language")) {
                         if (v.language=="markdown") {
-                            var htmlText = converter.makeHtml(v.content);
-                            elem.html(htmlText);
+                            elem.html(converter.makeHtml(v.content));
                         }
                         else if (v.language=="textile") {
-                            var htmlText = convert_textile(v.content);
-                            elem.html(htmlText);
+                            elem.html(convert_textile(v.content));
                         }
                         else {
                             elem.html(v.content); 
@@ -172,7 +170,7 @@ App.directive('markup', function () {
                 }
             }, true);
         }
-    }
+    };
 });
 
 
@@ -245,7 +243,7 @@ function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
         $scope.newTodo = $scope.userdb.newDoc(); 
         $scope.newTodo.type = "todo";
         $scope.newTodo.tags= [];
-    }   
+    };
 
     $scope.initNewTodo();
     $scope.updateTagsList();
@@ -273,8 +271,8 @@ function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
         $scope.todos_bytags={};
 
         if ($scope.tags.selected==="[All Tags]") {
-            var startkey=undefined;
-            var endkey=undefined;
+            startkey=undefined;
+            endkey=undefined;
         }
 
         $scope.userdb.query("todo", $scope.subtype + "_by_tag", { startkey: startkey, endkey: endkey, include_docs: true })
@@ -347,7 +345,7 @@ function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
         $scope.newTodo = $scope.userdb.newDoc(); 
         $scope.newTodo.type = "todo";
         $scope.newTodo.tags= [];
-    }   
+    };
 
 
     $scope.initNewTodo();
