@@ -19,7 +19,7 @@
 
 
 
-var App = angular.module('TodoApp', ['CornerCouch'])
+var App = angular.module('TodoApp', ['CornerCouch', 'PouchDB'])
     .config(function($routeProvider) {
         $routeProvider
             .when('/', {controller: OverviewCtrl, templateUrl: 'overview.html'})
@@ -29,14 +29,11 @@ var App = angular.module('TodoApp', ['CornerCouch'])
             .when('/tickler', {controller: TicklerCtrl, templateUrl: 'tickler.html'})
             .otherwise({redirectTo: '/'});
     })
-    .service( 'TicklerWatch', [ '$rootScope', '$timeout', '$location', 'cornercouch', function( $rootScope, $timeout, $location, cornercouch) {
+    .service( 'TicklerWatch', [ '$rootScope', '$timeout', 'pouchdb', function( $rootScope, $timeout, pouchdb) {
         var pending=false;
-        var server = cornercouch();
         var timestamp = new Date(0);
-        var uri = parseUri($location.absUrl());
     
-//    $scope.server.session();
-        userdb = server.getDB(uri.database);
+        var userdb = pouchdb;
 
         function update() {
             var current_timestamp = new Date();
@@ -174,9 +171,13 @@ App.directive('markup', function () {
 });
 
 
-function AppCtrl($scope, TicklerWatch) {
+function AppCtrl($scope, TicklerWatch, pouchdb) {
     $scope.pendingTicklers=TicklerWatch.pendingTicklers;
+    $scope.obj= pouchdb.replicating();
+    $scope.startReplication=pouchdb.startReplication;
+    $scope.stopReplication=pouchdb.stopReplication;
     TicklerWatch.update();
+    //pouchdb.startReplication();
 }
 
 
@@ -184,40 +185,26 @@ function OverviewCtrl($scope, $location, cornercouch, TicklerWatch) {
     TicklerWatch.update();
 }
 
-function NextCtrl($scope, $location, cornercouch, TicklerWatch) {
+function NextCtrl($scope, $location, pouchdb, TicklerWatch) {
     $scope.subtype="next";
-    TodoCtrl($scope, $location, cornercouch, TicklerWatch);
+    TodoCtrl($scope, $location, pouchdb, TicklerWatch);
 }
 
-function FutureCtrl($scope, $location, cornercouch, TicklerWatch) {
+function FutureCtrl($scope, $location, pouchdb, TicklerWatch) {
     $scope.subtype="future";
-    TodoCtrl($scope, $location, cornercouch, TicklerWatch);
+    TodoCtrl($scope, $location, pouchdb, TicklerWatch);
 }
 
-function WaitingCtrl($scope, $location, cornercouch, TicklerWatch) {
+function WaitingCtrl($scope, $location, pouchdb, TicklerWatch) {
     $scope.subtype="waiting";
-    TodoCtrl($scope, $location, cornercouch, TicklerWatch);
+    TodoCtrl($scope, $location, pouchdb, TicklerWatch);
 }
 
-function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
+function TodoCtrl($scope, $location, pouchdb, TicklerWatch) {
     TicklerWatch.update();
-    $scope.server = cornercouch();
     
-    var uri = parseUri($location.absUrl());
+    $scope.userdb = pouchdb;
     
-//    $scope.server.session();
-    $scope.userdb = $scope.server.getDB(uri.database);
-    remoteDatabase = uri.protocol + '//' + uri.host + '/' + uri.database + '/';
-    var c2p = $scope.userdb.pouchdb.replicate.from(remoteDatabase, {
-        continuous: true
-    });
-
-    var p2c = $scope.userdb.pouchdb.replicate.to(remoteDatabase, {
-        continuous: true
-    });
-
-    //p2c.cancel();
-
     $scope.tags={list: []};
     
     $scope.updateTagsList = function() {
@@ -330,17 +317,11 @@ function TodoCtrl($scope, $location, cornercouch, TicklerWatch) {
 
 
 
-function TicklerCtrl($scope, $location, cornercouch, TicklerWatch) {
+function TicklerCtrl($scope, $location, pouchdb, TicklerWatch) {
     TicklerWatch.update();
     $scope.subtype="tickler";
-    $scope.server = cornercouch();
+    $scope.userdb = pouchdb;
 
-    var uri = parseUri($location.absUrl());
-    
-//    $scope.server.session();
-    $scope.userdb = $scope.server.getDB(uri.database);
-
-      
     $scope.initNewTodo = function() {
         $scope.newTodo = $scope.userdb.newDoc(); 
         $scope.newTodo.type = "todo";

@@ -97,7 +97,15 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
 
         return deferred.promise;
     };
+
+    CouchDB.prototype.replicateTo = function (remoteDatabase, options) {
+        return this.pouchdb.replicate.to(remoteDatabase, options);
+    };
     
+    CouchDB.prototype.replicateFrom = function (remoteDatabase, options) {
+        return this.pouchdb.replicate.from(remoteDatabase, options);
+    };
+
     CouchDB.prototype.newDoc = function(initData) {
         return new this.docClass(initData);
     };
