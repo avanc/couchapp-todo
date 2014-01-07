@@ -12,11 +12,12 @@ factory('pouchdb', ['$location', 'cornercouch',  function($location, cornercouch
         database.stopReplication();
         
         replicationTo = database.replicateTo(remoteDatabase, {
-            continuous: true
+            continuous: true,
         });
     
         replicationFrom = database.replicateFrom(remoteDatabase, {
-            continuous: true
+            continuous: true,
+            filter: 'todo/filterTodos'
         });
         obj.replicating = true;
     };
