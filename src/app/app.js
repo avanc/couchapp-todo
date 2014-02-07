@@ -19,8 +19,9 @@
 
 require('./../contrib/angular');
 require('./pouchfactory.js');
-var Showdown = require('./../contrib/showdown');
-require('./../contrib/textile.js');
+
+
+
 var helpers = require('./helpers.js');
 
 var App = angular.module('TodoApp', ['CornerCouch', 'PouchDB'])
@@ -145,35 +146,7 @@ App.directive('mytodo', function () {
 });
    
 
-App.directive('markup', function () {
-    return {
-        restrict: 'A',
-        scope: true, //Child scope
-        link: function (scope, elem, attrs) {
-            var converter = new Showdown.converter();
-            
-            scope.$watch(attrs.markup, function(v) {
-                if (typeof(v)!== "undefined") {
-                    if (v.hasOwnProperty("language")) {
-                        if (v.language=="markdown") {
-                            elem.html(converter.makeHtml(v.content));
-                        }
-                        else if (v.language=="textile") {
-                            elem.html(convert_textile(v.content));
-                        }
-                        else {
-                            elem.html(v.content); 
-                        }
-                    }
-                    else {
-                        elem.html(v); 
-                    }
-                }
-            }, true);
-        }
-    };
-});
-
+App.directive('markup', require('./markup/markup-directive.js'));
 
 App.controller('AppCtrl', ['$scope', 'TicklerWatch', 'pouchdb', function($scope, TicklerWatch, pouchdb) {
     $scope.pendingTicklers=TicklerWatch.pendingTicklers;
