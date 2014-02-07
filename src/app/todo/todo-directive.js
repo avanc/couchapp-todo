@@ -1,9 +1,11 @@
 
+var helpers = require('./../helpers.js');
+
 module.exports = function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="saveTodo()"> ' +
+                        '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="tickTodo()"> ' +
                         '<a class="todo_title done-{{todo.done}}" href="" ng-click="toggleDetails()"><span class="todo_date" ng_show="isTickler()">{{todo.date}} </span>{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
                         '<div ng_show="showDetails" markup="todo.details"></div>' +
                         '<span ng_show="showDetails" class="tag" ng-repeat="tag in todo.tags">{{tag}}</span>' +
@@ -25,7 +27,7 @@ module.exports = function () {
         },
         link: function (scope, elem, attrs) {
             scope.subtypes = ["next", "future", "waiting", "tickler"];
-            scope.recurrencies = ["daily", "weekly", "monthly", "yearly"];
+            scope.recurrencies = ["no recurrence", "daily", "weekly", "monthly", "quarterly", "yearly"];
             
             scope.toggleDetails = function() {
                 scope.showDetails=!scope.showDetails;
@@ -39,6 +41,47 @@ module.exports = function () {
                 scope.todo.save().then( function() {
                     scope.editing=false;
                 });
+            };
+
+            scope.tickTodo = function() {
+                if (scope.todo.subtype==="tickler") {
+                    if (scope.todo.done) {
+                        var date;
+                        if (scope.todo.recurrence==="daily") {
+                            scope.todo.done = false;
+                            date = new Date(scope.todo.date);
+                            date.addDays(1);
+                            scope.todo.date = helpers.getIsoDate(date);
+                        }
+                        else if (scope.todo.recurrence==="weekly") {
+                            scope.todo.done = false;
+                            date = new Date(scope.todo.date);
+                            date.addWeeks(1);
+                            scope.todo.date = helpers.getIsoDate(date);
+                        }
+                        else if (scope.todo.recurrence==="monthly") {
+                            scope.todo.done = false;
+                            date = new Date(scope.todo.date);
+                            date.addMonths(1);
+                            scope.todo.date = helpers.getIsoDate(date);
+                        }
+                        else if (scope.todo.recurrence==="quarterly") {
+                            scope.todo.done = false;
+                            date = new Date(scope.todo.date);
+                            date.addMonths(3);
+                            scope.todo.date = helpers.getIsoDate(date);
+                        }
+                        else if (scope.todo.recurrence==="yearly") {
+                            scope.todo.done = false;
+                            date = new Date(scope.todo.date);
+                            date.addYears(1);
+                            scope.todo.date = helpers.getIsoDate(date);
+                        }
+                    }
+                }
+                
+                
+                scope.saveTodo();
             };
 
             scope.loadTodo = function() {

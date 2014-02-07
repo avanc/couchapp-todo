@@ -43,4 +43,19 @@ Date.prototype.addDays = function(days) {
     return this;
 };
 
+Date.prototype.addWeeks = function(weeks) {
+    this.addDays(7*weeks);
+    return this;
+};
+
+Date.prototype.addMonths = function(months) {
+    this.setMonth(this.getMonth() + months);
+    return this;
+};
+
+Date.prototype.addYears = function(years) {
+    this.setFullYear(this.getFullYear() + years);
+    return this;
+};
+
 module.exports = helpers;
