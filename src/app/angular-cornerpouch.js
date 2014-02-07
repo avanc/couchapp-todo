@@ -1,3 +1,6 @@
+var PouchDB = require('pouchdb');
+
+
 // Copyright: 2013, Jochen Eddelbüttel
 // MIT License applies
 //
@@ -33,7 +36,7 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
                 });
             };
 
-            pouchdb.get(id, callback)
+            pouchdb.get(id, callback);
             return deferred.promise;
         };
 
@@ -64,7 +67,7 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
 
         CouchDoc.prototype.remove = function() {
             this._deleted=true;
-            return this.save()
+            return this.save();
         };
 
         // Document constructor
