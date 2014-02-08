@@ -22,7 +22,7 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
             ng.copy(init || {}, this);
         }
 
-        CouchDoc.prototype.load = function(id, docParams) {
+        CouchDoc.prototype.load = function() {
             var doc = this;
             var deferred = $q.defer();
             var callback = function(err, res) {
@@ -36,7 +36,7 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
                 });
             };
 
-            pouchdb.get(id, callback);
+            pouchdb.get(doc._id, callback);
             return deferred.promise;
         };
 
@@ -116,7 +116,8 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
     CouchDB.prototype.getDoc = function(id) {
 
         var doc = new this.docClass();
-        doc.load(id);
+        doc._id=id;
+        doc.load();
         return doc;
     
     };
