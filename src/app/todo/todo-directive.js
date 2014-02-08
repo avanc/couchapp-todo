@@ -13,7 +13,7 @@ module.exports = function () {
                     '<div ng_show="editing">' +
                         '<input class="todo_title" type="text" ng-model="todo.title"> <a href="" ng-click="saveTodo()">&#10003;</a> <a href="" ng-click="loadTodo()">&#10007;</a><br>' +
                         '<label>Type: </label><select ng-model="todo.subtype" ng-options="subtype for subtype in subtypes" ></select><br>' +
-                        '<span ng_show="isTickler()"><input type="text" ng-model="todo.date"><select ng-model="todo.recurrence" ng-options="option for option in recurrencies" ></select><br></span>' +
+                        '<span ng_show="isTickler()"><input type="date" ng-model="todo.date"><select ng-model="todo.recurrence" ng-options="option for option in recurrencies" ></select><br></span>' +
                         '<textarea class="details_input" ng-model="todo.details.content" placeholder="Details"></textarea><br>' +
                         '<select ng-model="todo.details.language"><option value="unformatted">Unformated</option><option value="markdown">Markdown</option><option value="textile">Textile</option></select><br>' +
                         '<span class="tag" ng-repeat="tag in todo.tags">{{tag}}&nbsp;<a href="" ng-click="removeTag(tag)">&times;</a> </span>' +

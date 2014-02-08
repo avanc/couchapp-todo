@@ -18,11 +18,12 @@
 
 
 require('./../contrib/angular');
+require('./../contrib/angular-route');
 require('./pouchfactory.js');
 
 var TodoController = require('./controller/todo-controller.js');
 
-var App = angular.module('TodoApp', ['CornerCouch', 'PouchDB'])
+var App = angular.module('TodoApp', ['ngRoute', 'CornerCouch', 'PouchDB'])
     .config(function($routeProvider) {
         $routeProvider
             .when('/', {controller: require('./controller/overview-controller.js'), templateUrl: 'overview.html'})
