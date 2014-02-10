@@ -5,8 +5,10 @@ module.exports = function () {
     return {
         restrict: 'E',
         template:   '<div ng-hide="editing">' +
-                        '<input style="float:right" type="checkbox" ng-model="todo.done" ng-change="tickTodo()"> ' +
-                        '<a class="todo_title done-{{todo.done}}" href="" ng-click="toggleDetails()"><span class="todo_date" ng_show="isTickler()">{{todo.date}} </span>{{todo.title}}<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
+                        '<input style="float:right" type="checkbox" ng-hide="isRecurrenceTickler()" ng-model="todo.done" ng-change="tickTodo()"> ' +
+                        '<a href="" ng-click="deferRecurrence()" class="textbutton" style="float:right" ng-show="isRecurrenceTickler()">{{ getDeferString() }}</a> ' +
+                        '<a class="todo_title done-{{todo.done}}" href="" ng-click="toggleDetails()"><span class="todo_date" ng_show="isTickler()">{{todo.date}} </span>{{todo.title}}' +
+                        '<span ng_show="detailsavailable() && !showDetails"> &hellip;</span></a> <a href="" ng_show="showDetails" ng-click="editTodo()">&#9998;</a>' +
                         '<div ng_show="showDetails" markup="todo.details"></div>' +
                         '<span ng_show="showDetails" class="tag" ng-repeat="tag in todo.tags">{{tag}}</span>' +
                     '</div>' +
@@ -43,44 +45,62 @@ module.exports = function () {
                 });
             };
 
-            scope.tickTodo = function() {
+            scope.getDeferString = function() {
+                if (scope.todo.recurrence==="daily") {
+                    return "+d";
+                }
+                else if (scope.todo.recurrence==="weekly") {
+                    return "+w";
+                }
+                else if (scope.todo.recurrence==="monthly") {
+                    return "+m";
+                }
+                else if (scope.todo.recurrence==="quarterly") {
+                    return "+q";
+                }
+                else if (scope.todo.recurrence==="yearly") {
+                    return "+y";
+                }
+                else {
+                    return "n.a.";
+                }
+                    
+            };
+            
+            scope.deferRecurrence = function() {
                 if (scope.todo.subtype==="tickler") {
-                    if (scope.todo.done) {
-                        var date;
-                        if (scope.todo.recurrence==="daily") {
-                            scope.todo.done = false;
-                            date = new Date(scope.todo.date);
-                            date.addDays(1);
-                            scope.todo.date = helpers.getIsoDate(date);
-                        }
-                        else if (scope.todo.recurrence==="weekly") {
-                            scope.todo.done = false;
-                            date = new Date(scope.todo.date);
-                            date.addWeeks(1);
-                            scope.todo.date = helpers.getIsoDate(date);
-                        }
-                        else if (scope.todo.recurrence==="monthly") {
-                            scope.todo.done = false;
-                            date = new Date(scope.todo.date);
-                            date.addMonths(1);
-                            scope.todo.date = helpers.getIsoDate(date);
-                        }
-                        else if (scope.todo.recurrence==="quarterly") {
-                            scope.todo.done = false;
-                            date = new Date(scope.todo.date);
-                            date.addMonths(3);
-                            scope.todo.date = helpers.getIsoDate(date);
-                        }
-                        else if (scope.todo.recurrence==="yearly") {
-                            scope.todo.done = false;
-                            date = new Date(scope.todo.date);
-                            date.addYears(1);
-                            scope.todo.date = helpers.getIsoDate(date);
-                        }
+                    var date;
+                    if (scope.todo.recurrence==="daily") {
+                        date = new Date(scope.todo.date);
+                        date.addDays(1);
+                        scope.todo.date = helpers.getIsoDate(date);
+                    }
+                    else if (scope.todo.recurrence==="weekly") {
+                        date = new Date(scope.todo.date);
+                        date.addWeeks(1);
+                        scope.todo.date = helpers.getIsoDate(date);
+                    }
+                    else if (scope.todo.recurrence==="monthly") {
+                        date = new Date(scope.todo.date);
+                        date.addMonths(1);
+                        scope.todo.date = helpers.getIsoDate(date);
+                    }
+                    else if (scope.todo.recurrence==="quarterly") {
+                        date = new Date(scope.todo.date);
+                        date.addMonths(3);
+                        scope.todo.date = helpers.getIsoDate(date);
+                    }
+                    else if (scope.todo.recurrence==="yearly") {
+                        date = new Date(scope.todo.date);
+                        date.addYears(1);
+                        scope.todo.date = helpers.getIsoDate(date);
                     }
                 }
+                scope.saveTodo();
                 
-                
+            };
+            
+            scope.tickTodo = function() {
                 scope.saveTodo();
             };
 
@@ -92,6 +112,10 @@ module.exports = function () {
 
             scope.isTickler = function(){
                 return (scope.todo.subtype==="tickler");
+            };
+
+            scope.isRecurrenceTickler = function(){
+                return ( (scope.todo.subtype==="tickler") && (scope.recurrencies.indexOf(scope.todo.recurrence) > 0) );
             };
             
             scope.detailsavailable = function(){
