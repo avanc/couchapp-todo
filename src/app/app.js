@@ -19,11 +19,12 @@
 
 require('./../contrib/angular');
 require('./../contrib/angular-route');
+require('./../contrib/angular-cookies');
 require('./pouchfactory.js');
 
 var TodoController = require('./controller/todo-controller.js');
 
-var App = angular.module('TodoApp', ['ngRoute', 'CornerCouch', 'PouchDB'])
+var App = angular.module('TodoApp', ['ngRoute', 'ngCookies', 'CornerCouch', 'PouchDB'])
     .config(['$routeProvider', function($routeProvider) {
         $routeProvider
             .when('/', {controller: require('./controller/overview-controller.js'), templateUrl: 'overview.html'})
@@ -33,10 +34,10 @@ var App = angular.module('TodoApp', ['ngRoute', 'CornerCouch', 'PouchDB'])
             .when('/tickler', {controller: require('./controller/tickler-controller.js'), templateUrl: 'tickler.html'})
             .otherwise({redirectTo: '/'});
     }])
-    .service( 'TicklerWatch', require('./ticklerwatch-service.js'));
+    .service( 'TicklerWatch', require('./ticklerwatch-service.js'))
+    .service( 'Configuration', require('./configuration-service.js'));
 
 App.directive('mytodo', require('./todo/todo-directive.js'));
 App.directive('markup', require('./markup/markup-directive.js'));
-
 App.controller('AppCtrl', require('./controller/app-controller.js'));
 
