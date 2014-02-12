@@ -7,9 +7,12 @@ module.exports = function(subtype) {
         $scope.userdb = pouchdb;
         
         $scope.tags={list: []};
+        $scope.tags.selected=$location.search().tag;
+        if (typeof($scope.tags.selected)==="undefined") {
+            $scope.tags.selected="[All Tags]";
+        }
         
         $scope.updateTagsList = function() {
-        
             $scope.userdb.query("todo", "tags", { group: true })
                 .then(function(data) {
                     var tags=["[All Tags]"];
@@ -18,10 +21,8 @@ module.exports = function(subtype) {
                         tags.push(row.key);
                     }
                     $scope.tags.list=tags;
-                if (typeof($scope.tags.selected) == "undefined") {
-                    $scope.changedTag($scope.tags.list[0]);
-                }
-            });
+                });
+            
         };
 
     
@@ -39,8 +40,6 @@ module.exports = function(subtype) {
             });
         };
 
-        $scope.initNewTodo();
-        $scope.updateTagsList();
         
         $scope.addTodo = function() {
             $scope.newTodo.subtype=$scope.subtype;
@@ -54,10 +53,8 @@ module.exports = function(subtype) {
         };
         
 
-        $scope.changedTag = function(tag) {
-            if (typeof(tag)!=="undefined") {
-                $scope.tags.selected=tag;
-            }
+        $scope.changedTag = function() {
+            $location.search({"tag": $scope.tags.selected});
 
             var startkey=[$scope.tags.selected];
             var endkey=[$scope.tags.selected, {}];
@@ -119,6 +116,13 @@ module.exports = function(subtype) {
                 // Has to be done after success!
             }
         };
+
+        
+        $scope.initNewTodo();
+        $scope.updateTagsList();
+        $scope.changedTag();
+
+        
     };
 
     controller.$inject = ['$scope', '$location', 'pouchdb', 'Configuration', 'TicklerWatch'];
