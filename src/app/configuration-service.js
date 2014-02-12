@@ -17,6 +17,33 @@ module.exports = function($cookieStore, pouchdb) {
         $cookieStore.remove(key);
     };
 
+    
+    var promise = pouchdb.getCreateDoc("todoapp_configuration");
+
+    global.get = function(key) {
+        return promise.then(function(configDoc) {
+                return configDoc[key];
+            });
+    };
+
+    global.put = function(key, value) {
+        return promise.then(function(configDoc) {
+                configDoc[key]=value;
+                console.log(configDoc);
+                return configDoc.save();
+            });
+    };
+    
+    global.remove = function(key) {
+        return promise.then(function(configDoc) {
+                delete configDoc[key];
+                return configDoc.save();
+            });
+    };
+    
+    
+    
+    
     return {
         local: local,
         global: global

@@ -114,14 +114,30 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
     };
 
     CouchDB.prototype.getDoc = function(id) {
-
         var doc = new this.docClass();
         doc._id=id;
-        doc.load();
-        return doc;
-    
+        return doc.load();
     };
 
+    CouchDB.prototype.getCreateDoc = function(id) {
+        var db=this;
+        
+        var promise = db.getDoc(id)
+            .then(function(doc) {
+                        return doc;
+                },
+                function(reason) {
+                    var doc = new db.docClass();
+                    doc._id=id;
+                    return doc;
+                }
+            );
+
+        return promise;
+    };
+
+    
+    
     CouchDB.prototype.getQueryDoc = function(idx) {
 
         var row = this.rows[idx];
