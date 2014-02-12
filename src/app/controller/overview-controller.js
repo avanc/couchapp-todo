@@ -13,7 +13,6 @@ module.exports = function($scope, TicklerWatch, Configuration) {
     };
     
     $scope.updateMarkupLanguage = function() {
-        console.log($scope.defaultMarkupLanguage);
         Configuration.global.put("DefaultMarkupLanguage", $scope.defaultMarkupLanguage);
     };
     

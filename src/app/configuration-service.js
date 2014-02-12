@@ -29,7 +29,6 @@ module.exports = function($cookieStore, pouchdb) {
     global.put = function(key, value) {
         return promise.then(function(configDoc) {
                 configDoc[key]=value;
-                console.log(configDoc);
                 return configDoc.save();
             });
     };

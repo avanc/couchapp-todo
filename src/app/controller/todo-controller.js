@@ -1,6 +1,6 @@
 
 module.exports = function(subtype) {
-    var controller = function($scope, $location, pouchdb, TicklerWatch) {
+    var controller = function($scope, $location, pouchdb, Configuration, TicklerWatch) {
         $scope.subtype=subtype;
         TicklerWatch.update();
         
@@ -31,6 +31,12 @@ module.exports = function(subtype) {
             $scope.newTodo = $scope.userdb.newDoc(); 
             $scope.newTodo.type = "todo";
             $scope.newTodo.tags= [];
+            $scope.newTodo.details = {"content": ""};
+            Configuration.global.get("DefaultMarkupLanguage").then(function(value) {
+                if (typeof($scope.newTodo.details.language)==="undefined") {
+                    $scope.newTodo.details.language = value;
+                }
+            });
         };
 
         $scope.initNewTodo();
@@ -115,7 +121,7 @@ module.exports = function(subtype) {
         };
     };
 
-    controller.$inject = ['$scope', '$location', 'pouchdb', 'TicklerWatch'];
+    controller.$inject = ['$scope', '$location', 'pouchdb', 'Configuration', 'TicklerWatch'];
     
     return controller;
 };
