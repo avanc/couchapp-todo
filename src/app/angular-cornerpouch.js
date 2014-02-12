@@ -5,7 +5,7 @@ var PouchDB = require('pouchdb');
 // MIT License applies
 //
 angular.module('CornerCouch', ['ng']).
-factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
+factory('cornercouch', ['$timeout', '$q', function($timeout, $q) {
 
     // Shorthand angular
     var ng = angular;
@@ -26,12 +26,12 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
             var doc = this;
             var deferred = $q.defer();
             var callback = function(err, res) {
-                return $rootScope.$apply(function() {
+                $timeout(function() {
                     if (err) {
-                        return deferred.reject(err);
+                        deferred.reject(err);
                     } else {
                         ng.copy(res, doc);
-                        return deferred.resolve(doc);
+                        deferred.resolve(doc);
                     }
                 });
             };
@@ -44,13 +44,13 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
             var doc = this;
             var deferred = $q.defer();
             var callback = function(err, res) {
-                return $rootScope.$apply(function() {
+                $timeout(function() {
                     if (err) {
-                        return deferred.reject(err);
+                        deferred.reject(err);
                     } else {
                         if (res.id)  doc._id  = res.id;
                         if (res.rev) doc._rev = res.rev;
-                        return deferred.resolve(doc);
+                        deferred.resolve(doc);
                     }
                 });
             };
@@ -86,12 +86,12 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
         var db = this;
         var deferred = $q.defer();
         var callback = function(err, res) {
-            return $rootScope.$apply(function() {
+            $timeout(function() {
                 if (err) {
-                    return deferred.reject(err);
+                    deferred.reject(err);
                 } else {
                     db.info = res;
-                    return deferred.resolve(db);
+                    deferred.resolve(db);
                 }
             });
         };
@@ -158,12 +158,12 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
         var db = this;
         var deferred = $q.defer();
         var callback = function(err, res) {
-            return $rootScope.$apply(function() {
+            $timeout(function() {
                 if (err) {
-                    return deferred.reject(err);
+                    deferred.reject(err);
                 } else {
                     db.rows = res.rows;
-                    return deferred.resolve(res);
+                    deferred.resolve(res);
                 }
             });
         };
@@ -230,12 +230,12 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
         var server = this;
         var deferred = $q.defer();
         var callback = function(err, res) {
-            return $rootScope.$apply(function() {
+            $timeout(function() {
                 if (err) {
-                    return deferred.reject(err);
+                    deferred.reject(err);
                 } else {
                     server.databases = res;
-                    return deferred.resolve(res);
+                    deferred.resolve(res);
                 }
             });
         };
@@ -247,12 +247,12 @@ factory('cornercouch', ['$rootScope', '$q', function($rootScope, $q) {
         var server = this;
         var deferred = $q.defer();
         var callback = function(err, res) {
-            return $rootScope.$apply(function() {
+            $timeout(function() {
                 if (err) {
-                    return deferred.reject(err);
+                    deferred.reject(err);
                 } else {
                     server.databases = res;
-                    return deferred.resolve(res);
+                    deferred.resolve(res);
                 }
             });
         };

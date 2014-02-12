@@ -5,7 +5,6 @@ module.exports = function($scope, TicklerWatch, Configuration) {
     
     Configuration.global.get("DefaultMarkupLanguage").then(function(value) {
         $scope.defaultMarkupLanguage=value;
-        $scope.$apply();
     });
     
     
