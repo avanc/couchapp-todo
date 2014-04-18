@@ -11,14 +11,16 @@ module.exports = function () {
             scope.$watch(attrs.markup, function(v) {
                 if (typeof(v)!== "undefined") {
                     if (v.hasOwnProperty("language")) {
-                        if (v.language=="markdown") {
-                            elem.html(marked(v.content));
-                        }
-                        else if (v.language=="textile") {
-                            elem.html(textile(v.content));
-                        }
-                        else {
-                            elem.html(v.content); 
+                        if (v.hasOwnProperty("content")) {
+                            if (v.language=="markdown") {
+                                elem.html(marked(v.content));
+                            }
+                            else if (v.language=="textile") {
+                                elem.html(textile(v.content));
+                            }
+                            else {
+                                elem.html(v.content); 
+                            }
                         }
                     }
                     else {
