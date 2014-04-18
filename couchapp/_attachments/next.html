@@ -1,14 +1,22 @@
-<label>Tag: </label><select ng-model="tags.selected" ng-options="tag for tag in tags.list" ng-change="changedTag()"></select><br>
-<span>{{countRemaining()}} of {{countAll()}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
+<!-- <div class="row"> -->
+    <div class="col-md-12">
+        <label>Tag: </label><select ng-model="tags.selected" ng-options="tag for tag in tags.list" ng-change="changedTag()"></select><br>
+        <span>{{countRemaining()}} of {{countAll()}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
 
-<form ng-submit="addTodo()">
-    <input type="text" style="width: 100%;" ng-model="newTodo.title" placeholder="add new todo here">
-</form>
-
-<fieldset class="todo_list" ng-repeat="todos in todos_bytags">
-    <legend>{{todos.tag}}</legend>
-    <div ng-repeat="todo in todos.list">
-        <hr ng-hide="$first" class="todo">
-        <mytodo todo="todo"></mytodo>
+        <form ng-submit="addTodo()">
+            <input type="text" style="width: 100%;" ng-model="newTodo.title" placeholder="add new todo here">
+        </form>
     </div>
-</fieldset>
+<!-- </div> -->
+
+<!-- <div class="row"> -->
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" ng-repeat="todos in todos_bytags">
+        <fieldset class="todo_list" >
+            <legend>{{todos.tag}}</legend>
+            <div ng-repeat="todo in todos.list">
+                <hr ng-hide="$first" class="todo">
+                <mytodo todo="todo"></mytodo>
+            </div>
+        </fieldset>
+    </div>
+<!-- </div> -->

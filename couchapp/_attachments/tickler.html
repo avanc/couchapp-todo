@@ -1,13 +1,17 @@
-<span>{{countRemaining()}} of {{countAll()}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
+<div class="col-md-12">
+    <span>{{countRemaining()}} of {{countAll()}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
 
-<form ng-submit="addTodo()">
-    <input type="text" style="width: 100%;" ng-model="newTodo.title" size="30" placeholder="add new todo here">
-</form>
+    <form ng-submit="addTodo()">
+        <input type="text" style="width: 100%;" ng-model="newTodo.title" size="30" placeholder="add new todo here">
+    </form>
+</div>
 
-<fieldset class="todo_list" ng-repeat="group in todos_grouped">
-    <legend>{{group.title}}</legend>
-    <div ng-repeat="todo in group.list">
-        <hr ng-hide="$first" class="todo">
-        <mytodo todo="todo"></mytodo>
-    </div>
-</fieldset>
+<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" ng-repeat="group in todos_grouped">
+    <fieldset class="todo_list">
+        <legend>{{group.title}}</legend>
+        <div ng-repeat="todo in group.list">
+            <hr ng-hide="$first" class="todo">
+            <mytodo todo="todo"></mytodo>
+        </div>
+    </fieldset>
+</div>
