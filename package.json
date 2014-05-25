@@ -16,7 +16,7 @@
     "grunt-couchapp": "~0.2.1",
     "browserify": "~3.43.0",
     "grunt-browserify": "~2.0.7",
-    "pouchdb": "~1.1.0",
+    "pouchdb": "~2.2.2",
     "textile-js": "~0.1.8",
     "marked": "~0.3.2"
   }
