@@ -31,7 +31,7 @@ module.exports = function(subtype) {
         $scope.initNewTodo = function() {
             $scope.newTodo = $scope.userdb.newDoc(); 
             $scope.newTodo.type = "todo";
-            $scope.newTodo.tags= [];
+            $scope.newTodo.tags= ["new"];
             $scope.newTodo.details = {"content": ""};
             Configuration.global.get("DefaultMarkupLanguage").then(function(value) {
                 if (typeof($scope.newTodo.details.language)==="undefined") {
@@ -43,7 +43,9 @@ module.exports = function(subtype) {
         
         $scope.addTodo = function() {
             $scope.newTodo.subtype=$scope.subtype;
-            $scope.newTodo.tags.push($scope.tags.selected);
+            if ($scope.tags.selected!=="[All Tags]") {
+                $scope.newTodo.tags.push($scope.tags.selected);
+            }
             $scope.newTodo.save()
                 .then(function() {
                     $scope.changedTag();
